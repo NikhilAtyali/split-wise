@@ -29,7 +29,7 @@ export function exportToExcel(contributions, expenses) {
     Note: '',
   })
   contribRows.push({})
-  contribRows.push({ Member: 'Conversion Rates:', Amount: '1 USD = ₹93', Currency: '186 IDR = ₹1' })
+  contribRows.push({ Member: 'Conversion Rates:', Amount: '1 USD = ₹94', Currency: '186 IDR = ₹1' })
 
   const ws1 = XLSX.utils.json_to_sheet(contribRows)
   ws1['!cols'] = [{ wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 16 }, { wch: 20 }]
@@ -73,7 +73,7 @@ export function exportToExcel(contributions, expenses) {
     'Split Between': '',
   })
   expenseRows.push({})
-  expenseRows.push({ Description: 'Conversion Rates:', Type: '1 USD = ₹93', Amount: '186 IDR = ₹1' })
+  expenseRows.push({ Description: 'Conversion Rates:', Type: '1 USD = ₹94', Amount: '186 IDR = ₹1' })
 
   const ws2 = XLSX.utils.json_to_sheet(expenseRows)
   ws2['!cols'] = [{ wch: 28 }, { wch: 30 }, { wch: 14 }, { wch: 10 }, { wch: 16 }, { wch: 14 }, { wch: 28 }]
@@ -130,7 +130,7 @@ export function exportToExcel(contributions, expenses) {
   summaryRows.push({
     Member: `Common Expense Per Person: ₹${fmt(perPersonCommonShare)}`,
   })
-  summaryRows.push({ Member: 'Conversion Rates:', 'Fund In (INR)': '1 USD = ₹93', 'Fund In (Original)': '186 IDR = ₹1' })
+  summaryRows.push({ Member: 'Conversion Rates:', 'Fund In (INR)': '1 USD = ₹94', 'Fund In (Original)': '186 IDR = ₹1' })
 
   const ws3 = XLSX.utils.json_to_sheet(summaryRows)
   ws3['!cols'] = [

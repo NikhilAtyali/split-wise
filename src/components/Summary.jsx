@@ -262,7 +262,7 @@ export default function Summary() {
         <div className="font-semibold text-gray-500 mb-1">
           Conversion Rates Used
         </div>
-        <div>1 USD = ₹93.00</div>
+        <div>1 USD = ₹94.00</div>
         <div>186 IDR = ₹1.00</div>
       </div>
     </div>

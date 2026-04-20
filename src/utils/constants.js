@@ -2,7 +2,7 @@ export const MEMBERS = ['Nikhil', 'Jeevan', 'Sankalp', 'Santosh', 'Amar']
 
 export const CURRENCIES = {
   INR: { label: 'INR (₹)', symbol: '₹', toINR: (amount) => amount },
-  USD: { label: 'USD ($)', symbol: '$', toINR: (amount) => amount * 93 },
+  USD: { label: 'USD ($)', symbol: '$', toINR: (amount) => amount * 94 },
   IDR: { label: 'IDR (Rp)', symbol: 'Rp', toINR: (amount) => amount / 186 },
 }
 
