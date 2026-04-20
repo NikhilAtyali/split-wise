@@ -83,16 +83,18 @@ export function calculateBalances(contributions, expenses) {
 
   const perPersonCommonShare = totalCommonExpenses / memberCount
 
-  // Each person's raw net = what they put in - what they owe
-  // Unspent fund cash must be returned equally, so we normalize to zero-sum
-  const fundReturnPerPerson = remainingFund / memberCount
+  // Settlement is based ONLY on actual expenses, not fund contributions.
+  // Fund is shared cash — spending from it is everyone's equal credit.
+  // Card payments are individual credit.
+  // Each person's net = their credits - their debits.
+  const fundCreditPerPerson = totalFundSpent / memberCount
 
   const net = {}
   MEMBERS.forEach((m) => {
     commonShare[m] = perPersonCommonShare
-    const totalPutIn = fundContributed[m] + cardPaid[m]
-    const totalOwes = commonShare[m] + personalUsage[m]
-    net[m] = totalPutIn - totalOwes - fundReturnPerPerson
+    const credits = cardPaid[m] + fundCreditPerPerson
+    const debits = commonShare[m] + personalUsage[m]
+    net[m] = credits - debits
   })
 
   return {
