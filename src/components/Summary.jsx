@@ -55,27 +55,43 @@ export default function Summary() {
     net,
     totalCommonExpenses,
     perPersonCommonShare,
+    totalFund,
+    totalFundSpent,
+    remainingFund,
+    directDebts,
   } = calculateBalances(contributions, expenses)
   const transactions = simplifyDebts(net)
 
-  const totalContributions = contributions.reduce(
-    (sum, c) => sum + toINR(c.amount, c.currency),
-    0
-  )
   const totalCardPayments = Object.values(cardPaid).reduce((a, b) => a + b, 0)
   const totalPersonalUsage = Object.values(personalUsage).reduce((a, b) => a + b, 0)
 
   return (
     <div className="space-y-6">
-      {/* Top-level Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-xl p-4 text-white shadow-lg">
-          <div className="flex items-center gap-1.5 text-teal-100 text-[10px] font-medium uppercase tracking-wider mb-1">
-            <Wallet size={12} />
-            Common Fund
-          </div>
-          <div className="text-xl font-bold">{formatINR(totalContributions)}</div>
+      {/* Cash Pool Status */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <Wallet size={14} />
+          Cash Pool Status
         </div>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <div className="text-xs text-gray-400 mb-0.5">Collected</div>
+            <div className="text-lg font-bold text-teal-700">{formatINR(totalFund)}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-400 mb-0.5">Spent from Pool</div>
+            <div className="text-lg font-bold text-orange-600">{formatINR(totalFundSpent)}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-400 mb-0.5">Remaining Cash</div>
+            <div className="text-lg font-bold text-emerald-600">{formatINR(remainingFund)}</div>
+            <div className="text-[10px] text-gray-400">{formatINR(remainingFund / 5)} per person</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Top-level Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl p-4 text-white shadow-lg">
           <div className="flex items-center gap-1.5 text-purple-100 text-[10px] font-medium uppercase tracking-wider mb-1">
             <CreditCard size={12} />
@@ -208,6 +224,50 @@ export default function Summary() {
           <span><strong className="text-green-600">Should Get</strong> / <strong className="text-red-600">Should Pay</strong> = (Fund In + Card Paid) − (Common Share + Personal Use)</span>
         </div>
       </div>
+
+      {/* Direct Card Debts (P→P) */}
+      {directDebts.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-rose-100 overflow-hidden">
+          <div className="px-5 py-3 border-b border-rose-100 bg-rose-50/50">
+            <h3 className="text-sm font-semibold text-rose-600 uppercase tracking-wider">
+              Direct Card Debts (Personal → Personal)
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {directDebts.map((d, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between px-5 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">
+                    {d.from[0]}
+                  </div>
+                  <span className="font-medium text-gray-700 text-sm">
+                    {d.from}
+                  </span>
+                  <ArrowRight size={14} className="text-gray-400" />
+                  <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">
+                    {d.to[0]}
+                  </div>
+                  <span className="font-medium text-gray-700 text-sm">
+                    {d.to}
+                  </span>
+                  <span className="text-xs text-gray-400 ml-1">
+                    ({d.description})
+                  </span>
+                </div>
+                <div className="font-bold text-rose-700 text-sm">
+                  {formatINR(d.amount)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="px-5 py-2 bg-rose-50/50 text-[11px] text-gray-400">
+            These are raw card debts before simplification. The final payments below optimize the number of transactions.
+          </div>
+        </div>
+      )}
 
       {/* Settlement Transactions */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

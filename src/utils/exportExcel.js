@@ -87,9 +87,13 @@ export function exportToExcel(contributions, expenses) {
     cardOriginal,
     commonShare,
     personalUsage,
+    totalFund,
+    totalFundSpent,
+    remainingFund,
     net,
     totalCommonExpenses,
     perPersonCommonShare,
+    directDebts,
   } = calculateBalances(contributions, expenses)
 
   const summaryRows = MEMBERS.map((m) => {
@@ -127,6 +131,7 @@ export function exportToExcel(contributions, expenses) {
     'Should Pay (INR)': '',
   })
   summaryRows.push({})
+  summaryRows.push({ Member: `Cash Pool: Collected ₹${fmt(totalFund)} | Spent ₹${fmt(totalFundSpent)} | Remaining ₹${fmt(remainingFund)} (₹${fmt(remainingFund / 5)} per person)` })
   summaryRows.push({
     Member: `Common Expense Per Person: ₹${fmt(perPersonCommonShare)}`,
   })
@@ -157,6 +162,27 @@ export function exportToExcel(contributions, expenses) {
   const ws4 = XLSX.utils.json_to_sheet(settlementRows)
   ws4['!cols'] = [{ wch: 14 }, { wch: 4 }, { wch: 14 }, { wch: 16 }]
   XLSX.utils.book_append_sheet(wb, ws4, 'Settlements')
+
+  // ── Sheet 5: Direct Card Debts ──
+  if (directDebts.length > 0) {
+    const debtRows = directDebts.map((d) => ({
+      'Owes': d.from,
+      '→': '→',
+      'To': d.to,
+      'Amount (INR)': fmt(d.amount),
+      'For': d.description,
+    }))
+
+    const totalDirectDebt = directDebts.reduce((s, d) => s + d.amount, 0)
+    debtRows.push({})
+    debtRows.push({ 'Owes': 'TOTAL', '→': '', 'To': '', 'Amount (INR)': fmt(totalDirectDebt), 'For': '' })
+    debtRows.push({})
+    debtRows.push({ 'Owes': 'These are raw Personal → Personal debts before simplification.' })
+
+    const ws5 = XLSX.utils.json_to_sheet(debtRows)
+    ws5['!cols'] = [{ wch: 14 }, { wch: 4 }, { wch: 14 }, { wch: 16 }, { wch: 28 }]
+    XLSX.utils.book_append_sheet(wb, ws5, 'Direct Card Debts')
+  }
 
   // ── Download ──
   const today = new Date().toISOString().slice(0, 10)
