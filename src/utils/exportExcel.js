@@ -184,6 +184,33 @@ export function exportToExcel(contributions, expenses) {
     XLSX.utils.book_append_sheet(wb, ws5, 'Direct Card Debts')
   }
 
+  // ── Sheet 6: Expenses (Simple) ──
+  const simpleRows = expenses.map((e, i) => {
+    const beneficiaries = e.beneficiaries ? e.beneficiaries.join(', ') : e.beneficiary || ''
+    let splitInfo = ''
+    if (e.type === EXPENSE_TYPES.COMMON_TO_COMMON || e.type === EXPENSE_TYPES.PERSONAL_TO_COMMON) {
+      splitInfo = 'Everyone'
+    } else {
+      splitInfo = beneficiaries
+    }
+
+    return {
+      'Sr. No': i + 1,
+      'Description': e.description,
+      'Amount (INR)': fmt(toINR(e.amount, e.currency)),
+      'Paid By': e.paidBy || 'Common Fund',
+      'Split Between': splitInfo,
+    }
+  })
+
+  const totalSimpleINR = expenses.reduce((s, e) => s + toINR(e.amount, e.currency), 0)
+  simpleRows.push({})
+  simpleRows.push({ 'Sr. No': '', 'Description': 'TOTAL', 'Amount (INR)': fmt(totalSimpleINR), 'Paid By': '', 'Split Between': '' })
+
+  const ws6 = XLSX.utils.json_to_sheet(simpleRows)
+  ws6['!cols'] = [{ wch: 8 }, { wch: 30 }, { wch: 16 }, { wch: 14 }, { wch: 28 }]
+  XLSX.utils.book_append_sheet(wb, ws6, 'Expenses (Simple)')
+
   // ── Download ──
   const today = new Date().toISOString().slice(0, 10)
   XLSX.writeFile(wb, `Splitwise_BaliTrip_${today}.xlsx`)
